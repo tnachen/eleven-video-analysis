@@ -3,18 +3,11 @@ import numpy as np
 import scipy.signal as signal
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 
-def extract_audio_from_video(video_path):
-    video = VideoFileClip(video_path)
-    audio = video.audio
-    audio.write_audiofile("temp_audio.wav")
-    return "temp_audio.wav"
 
-def find_sample_timestamps(video_path, sample_path, threshold=0.8):
-    # Extract audio from video
-    video_audio_path = extract_audio_from_video(video_path)
 
+def find_sample_timestamps(audio_path, sample_path, threshold=0.8):
     # Load audio files
-    y_video, sr_video = librosa.load(video_audio_path)
+    y_video, sr_video = librosa.load(audio_path)
     y_sample, sr_sample = librosa.load(sample_path, sr=sr_video)
     
     # Ensure both audios have the same sample rate
@@ -107,21 +100,31 @@ def find_time_segments(winning_points, losing_points):
 
     return segments
 
+def extract_audio_from_video(video_path):
+    video = VideoFileClip(video_path)
+    audio = video.audio
+    audio.write_audiofile("temp_audio.wav")
+    return "temp_audio.wav"
+
 if __name__ == "__main__":
+    import sys
+
     # Example usage
-    video_path = "/mnt/c/Users/timot/Documents/ETT/videos/10000000_375369078844918_4554219605159487049_n.mp4"
-    sample_path = "/mnt/c/Users/timot/Downloads/loss-ball.wav"
-    losing_timestamps = find_sample_timestamps(video_path, sample_path)
+    video_path = f"/mnt/c/Users/timot/Documents/ETT/videos/{sys.argv[1]}"
+    sample_path = "loss-ball.wav"
+
+    audio_path = extract_audio_from_video(video_path + ".mp4")
+    
+    losing_timestamps = find_sample_timestamps(audio_path, sample_path)
 
     #print("Timestamps where the loss ball sample is played:")
     #write_timestamps_to_file(losing_timestamps, "loss_ball_timestamps.txt")
 
-    sample_path = "/mnt/c/Users/timot/Downloads/win-ball.wav"
-    winning_timestamps = find_sample_timestamps(video_path, sample_path, threshold=0.5)
+    sample_path = "win-ball.wav"
+    winning_timestamps = find_sample_timestamps(audio_path, sample_path, threshold=0.5)
 
     #write_timestamps_to_file(winning_timestamps, "win_ball_timestamps.txt")
 
     losing_point_time_segments = find_time_segments(winning_timestamps, losing_timestamps)
-    print(losing_point_time_segments)
-
-    cut_and_concatenate_video_segments(video_path, "output_video.mp4", losing_point_time_segments)
+    
+    cut_and_concatenate_video_segments(video_path, f"{video_path}_highlights.mp4", losing_point_time_segments)
