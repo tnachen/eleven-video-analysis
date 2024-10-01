@@ -108,23 +108,23 @@ def extract_audio_from_video(video_path):
 
 if __name__ == "__main__":
     import sys
-
+    import os
     # Example usage
     video_path = f"/mnt/c/Users/timot/Documents/ETT/videos/{sys.argv[1]}"
     sample_path = "loss-ball.wav"
 
     audio_path = extract_audio_from_video(video_path + ".mp4")
-    
-    losing_timestamps = find_sample_timestamps(audio_path, sample_path)
+    losing_timestamps = find_sample_timestamps(audio_path, sample_path, threshold=0.5)
 
     #print("Timestamps where the loss ball sample is played:")
-    #write_timestamps_to_file(losing_timestamps, "loss_ball_timestamps.txt")
+    write_timestamps_to_file(losing_timestamps, "loss_ball_timestamps.txt") # 0.8 threshold
 
     sample_path = "win-ball.wav"
     winning_timestamps = find_sample_timestamps(audio_path, sample_path, threshold=0.5)
-
-    #write_timestamps_to_file(winning_timestamps, "win_ball_timestamps.txt")
+    write_timestamps_to_file(winning_timestamps, "win_ball_timestamps.txt") # 0.5 threshold
 
     losing_point_time_segments = find_time_segments(winning_timestamps, losing_timestamps)
     
-    cut_and_concatenate_video_segments(video_path, f"{video_path}_highlights.mp4", losing_point_time_segments)
+    cut_and_concatenate_video_segments(video_path + ".mp4", f"{video_path}_highlights.mp4", losing_point_time_segments)
+
+    os.remove(audio_path)
