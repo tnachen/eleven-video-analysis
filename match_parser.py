@@ -1,8 +1,9 @@
+import sys
+import os
 import librosa
 import numpy as np
 import scipy.signal as signal
 from moviepy.editor import VideoFileClip, concatenate_videoclips
-
 
 
 def find_sample_timestamps(audio_path, sample_path, threshold=0.8):
@@ -107,17 +108,15 @@ def extract_audio_from_video(video_path):
     return "temp_audio.wav"
 
 if __name__ == "__main__":
-    import sys
-    import os
     # Example usage
     video_path = f"/mnt/c/Users/timot/Documents/ETT/videos/{sys.argv[1]}"
     sample_path = "loss-ball.wav"
 
     audio_path = extract_audio_from_video(video_path + ".mp4")
-    losing_timestamps = find_sample_timestamps(audio_path, sample_path, threshold=0.5)
+    losing_timestamps = find_sample_timestamps(audio_path, sample_path, threshold=0.55)
 
     #print("Timestamps where the loss ball sample is played:")
-    write_timestamps_to_file(losing_timestamps, "loss_ball_timestamps.txt") # 0.8 threshold
+    write_timestamps_to_file(losing_timestamps, "loss_ball_timestamps.txt")
 
     sample_path = "win-ball.wav"
     winning_timestamps = find_sample_timestamps(audio_path, sample_path, threshold=0.5)
